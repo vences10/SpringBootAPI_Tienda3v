@@ -1,4 +1,4 @@
-package com.generation.tienda3v.repository;
+package com.generation.tienda3v.repositories;
 
 import com.generation.tienda3v.models.Categoria;
 import org.springframework.data.jpa.repository.JpaRepository;
