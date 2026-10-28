@@ -68,4 +68,4 @@ public class Categoria {
         this.productos = productos;
     }//setProductos
 
-}// class Categoría
+}// class Categoria

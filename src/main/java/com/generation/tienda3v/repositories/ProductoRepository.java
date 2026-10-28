@@ -24,4 +24,4 @@ public interface ProductoRepository
     );
 
     boolean existsBySku(String sku);
-}
+} //ProductoRepository

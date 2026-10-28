@@ -16,4 +16,4 @@ public interface CategoriaRepository
     boolean existsByNombre(String nombre);
 
     boolean existsBySlug(String slug);
-}
+} // CategoriaRepository

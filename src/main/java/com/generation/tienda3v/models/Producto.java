@@ -127,4 +127,4 @@ public class Producto {
         return fechaCreacion;
     } //getFechaCreación
 
-} //class Producto
+} //class producto
