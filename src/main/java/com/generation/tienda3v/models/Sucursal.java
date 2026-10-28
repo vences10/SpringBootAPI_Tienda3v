@@ -12,11 +12,11 @@ public class Sucursal {
 
     @Id // Identificador único, generado automáticamente por MySQL
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
-    private Long id;
+    @Column(name = "id_sucursal", nullable = false, unique = true)
+    private Long id_sucursal;
     // Nombre de la sucursal
     @Column(nullable = false, length = 120)
-    private String nombre;
+    private String nombre_sucursal;
     // Dirección física
     @Column(nullable = false, length = 255)
     private String direccion;
@@ -43,19 +43,19 @@ public class Sucursal {
     }//constructor JPA
 
     public Long getId() {
-        return id;
+        return id_sucursal;
     }//getId
 
     public void setId(Long id) {
-        this.id = id;
+        this.id_sucursal = id_sucursal;
     }//setId
 
     public String getNombre() {
-        return nombre;
+        return nombre_sucursal;
     }//getNombre
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        this.nombre_sucursal = nombre_sucursal;
     }//setNombre
 
     public String getDireccion() {

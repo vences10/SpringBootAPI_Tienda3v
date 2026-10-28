@@ -7,10 +7,9 @@ import java.time.LocalDateTime;
 @Table(name = "inventario_sucursal")
 public class InventarioSucursal {
 
-    // Representa la llave primaria compuesta:
-    // sucursal_id + producto_id
+    // Representa la llave primaria compuesta: sucursal_id + producto_id
     @EmbeddedId
-    private InventarioSucursalId id;
+    private InventarioSucursalId id_sucursal;
 
     @MapsId("sucursalId") // Relaciona el inventario con una sucursal
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -33,11 +32,11 @@ public class InventarioSucursal {
     } //constructor
 
     public InventarioSucursalId getId() {
-        return id;
+        return id_sucursal;
     }// getId
 
     public void setId(InventarioSucursalId id) {
-        this.id = id;
+        this.id_sucursal = id_sucursal;
     } // setId
 
     public Sucursal getSucursal() {
