@@ -1,6 +1,6 @@
 package com.generation.tienda3v.models;
+
 import jakarta.persistence.*;
-import java.awt.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,8 +12,9 @@ public class Usuario {
     @Column(name = "id", nullable = false, unique = true)
     private Long id;
 
-    @Column(name = "rol_id", nullable = false)
-    private Long rolId;
+    @ManyToOne
+    @JoinColumn(name = "rol_id", nullable = false)
+    private Rol rol;
 
     @Column(name = "nombre", nullable = false, length = 80)
     private String nombre;
@@ -36,18 +37,25 @@ public class Usuario {
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 
-    @Column(name = "creado_en", nullable = false, updatable = false)
+    @Column(name = "creado_en", nullable = false)
     private LocalDateTime creadoEn;
 
     @Column(name = "actualizado_en", nullable = false)
     private LocalDateTime actualizadoEn;
 
     // Constructor completo
-    public Usuario(Long rolId, String nombre, String apellido, String correo,
-                   String telefono, String passwordHash,
-                   Boolean aceptaTerminos, Boolean activo) {
 
-        this.rolId = rolId;
+    public Usuario(
+            Rol rol,
+            String nombre,
+            String apellido,
+            String correo,
+            String telefono,
+            String passwordHash,
+            Boolean aceptaTerminos,
+            Boolean activo) {
+
+        this.rol = rol;
         this.nombre = nombre.toUpperCase();
         this.apellido = apellido.toUpperCase();
         this.correo = correo.toLowerCase();
@@ -58,10 +66,10 @@ public class Usuario {
     }
 
     // Constructor vacío requerido por JPA/Jackson
+
     public Usuario() {
     }
 
-    // Métodos automáticos para fechas
     @PrePersist
     protected void onCreate() {
         this.creadoEn = LocalDateTime.now();
@@ -79,8 +87,8 @@ public class Usuario {
         return id;
     }
 
-    public Long getRolId() {
-        return rolId;
+    public Rol getRol() {
+        return rol;
     }
 
     public String getNombre() {
@@ -121,8 +129,8 @@ public class Usuario {
 
     // Setters
 
-    public void setRolId(Long rolId) {
-        this.rolId = rolId;
+    public void setRol(Rol rol) {
+        this.rol = rol;
     }
 
     public void setNombre(String nombre) {
