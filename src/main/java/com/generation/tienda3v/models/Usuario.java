@@ -13,7 +13,7 @@ public class Usuario {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "rol_id", nullable = false)
+    @JoinColumn(name = "idRol", nullable = false)
     private Rol rol;
 
     @Column(name = "nombre", nullable = false, length = 80)
