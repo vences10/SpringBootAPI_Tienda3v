@@ -9,20 +9,42 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/3V/categorias")
+@RequestMapping("/api/categorias")
 @CrossOrigin(origins = "*")
-public class CategoriasController {
+public class CategoriaController {
 
     @Autowired
-    private CategoriaService categoriasService;
+    private CategoriaService categoriaService;
 
     @GetMapping
-    public List<Categoria> listarCategorias(){
-        return categoriasService.obtenerCategorias();
-    } //listarCategorias
+    public List<Categoria> listarCategorias() {
+        return categoriaService.obtenerTodas();
+    }//listarCategorias
+
+    @GetMapping("/activas")
+    public List<Categoria> listarCategoriasActivas() {
+        return categoriaService.obtenerActivas();
+    }//listarCategoriasActivas
 
     @GetMapping("/{id}")
-    public Optional<Categoria> obtenerCategoriaPorId(@PathVariable Integer id){
-        return categoriasService.obtenerCategoriaPorId(id);
-    }
-}// class CategoriasController
+    public Optional<Categoria> obtenerPorId(@PathVariable Long id) {
+        return categoriaService.obtenerPorId(id);
+    }//obtenerPorId
+
+    @PostMapping
+    public Categoria crearCategoria(@RequestBody Categoria categoria) {
+        return categoriaService.guardar(categoria);
+    }//crearCategoria
+
+    @PutMapping("/{id}")
+    public Categoria actualizarCategoria(@PathVariable Long id, @RequestBody Categoria categoria) {
+        categoria.setIdCategoria(id);
+        return categoriaService.guardar(categoria);
+    }//actualizarCategoria
+
+    @DeleteMapping("/{id}")
+    public void eliminarCategoria(@PathVariable Long id) {
+        categoriaService.eliminar(id);
+    }//eliminarCategoria
+
+}// class CategoriaController
