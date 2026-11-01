@@ -11,7 +11,7 @@ public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_categoria")
-    private Integer idCategoria;
+    private Long idCategoria;
 
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
@@ -22,19 +22,19 @@ public class Categoria {
     @Column(name = "activa", nullable = false)
     private Boolean activa = true;
 
-    @OneToMany(mappedBy = "categoria")
+    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Producto> productos = new ArrayList<>();
 
     public Categoria() {
-    } //categoria
+    }//Categoria
 
-    public Integer getIdCategoria() {
+    public Long getIdCategoria() {
         return idCategoria;
-    } //getIdCategoria
+    }//getIdCategoria
 
-    public void setIdCategoria(Integer idCategoria) {
+    public void setIdCategoria(Long idCategoria) {
         this.idCategoria = idCategoria;
-    } //setIdCategoria
+    }//setIdCategoria
 
     public String getNombre() {
         return nombre;
