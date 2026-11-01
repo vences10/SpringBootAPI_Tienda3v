@@ -9,34 +9,41 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-    public class ProductosService {
+public class ProductoService {
 
-        @Autowired
-        private ProductoRepository productosRepository;
+    @Autowired
+    private ProductoRepository productoRepository;
 
-        // Obtener todos los productos (GET)
-        public List<Producto> obtenerProductos() {
-            return productosRepository.findAll();
-        } //obtenerProductos
+    public List<Producto> obtenerTodos() {
+        return productoRepository.findAll();
+    }//obtenerTodos
 
-        // Obtener un producto por ID (GET)
-        public Optional<Producto> obtenerProductoPorId(Integer id) {
-            return productosRepository.findById(id);
-        } //obtenerProductoPorId
+    public List<Producto> obtenerActivos() {
+        return productoRepository.findByActivoTrue();
+    }//obtenerActivos
 
-        // Obtener productos por ID de categoría (GET)
-        public List<Producto> obtenerPorCategoria(Integer categoriaId) {
-            return productosRepository.findByCategoria_IdCategoria(categoriaId);
-        } //obtenerPorCategoria
+    public Optional<Producto> obtenerPorId(Long id) {
+        return productoRepository.findById(id);
+    }//obtenerPorId
 
-        // Guardar o actualizar un producto (POST / PUT)
-        public Producto guardarProducto(Producto producto) {
-            return productosRepository.save(producto);
-        } //guardarProducto
+    public Optional<Producto> obtenerPorSku(String sku) {
+        return productoRepository.findBySku(sku);
+    }//obtenerPorSku
 
-        // Eliminar un producto (DELETE)
-        public void eliminarProducto(Integer id) {
-            productosRepository.deleteById(id);
-        } //eliminarProducto
+    public List<Producto> obtenerPorCategoria(Long idCategoria) {
+        return productoRepository.findByCategoria_IdCategoria(idCategoria);
+    }//obtenerPorCategoria
 
-    }// class ProductosService
+    public List<Producto> obtenerPorCategoriaActivos(Long idCategoria) {
+        return productoRepository.findByCategoria_IdCategoriaAndActivoTrue(idCategoria);
+    }//obtenerPorCategoriaActivos
+
+    public Producto guardar(Producto producto) {
+        return productoRepository.save(producto);
+    }//guardar
+
+    public void eliminar(Long id) {
+        productoRepository.deleteById(id);
+    }//eliminar
+
+}// class ProductoService

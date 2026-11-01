@@ -9,30 +9,33 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CategoriasService {
+public class CategoriaService {
 
     @Autowired
     private CategoriaRepository categoriaRepository;
 
-    //Obtener todas las categorías - GET
-    public List<Categoria> obtenerCategorias() {
+    public List<Categoria> obtenerTodas() {
         return categoriaRepository.findAll();
-    }//obtenerCategorias
+    }//obtenerTodas
 
-    //obtener categoria por ID - GET
-    public Optional<Categoria> obtenerCategoriaPorId(Long id){
+    public List<Categoria> obtenerActivas() {
+        return categoriaRepository.findByActivaTrue();
+    }//obtenerActivas
+
+    public Optional<Categoria> obtenerPorId(Long id) {
         return categoriaRepository.findById(id);
-    }//obtenerCategoriaPorId
+    }//obtenerPorId
 
-    //guardar o actualizar una categoria - POST/PUT
-    public  Categoria guardar(Categoria categoria) {
+    public Optional<Categoria> obtenerPorSlug(String slug) {
+        return categoriaRepository.findBySlug(slug);
+    }//obtenerPorSlug
+
+    public Categoria guardar(Categoria categoria) {
         return categoriaRepository.save(categoria);
     }//guardar
 
-    //eliminar una categoría - DELETE
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         categoriaRepository.deleteById(id);
     }//eliminar
 
-
-}
+}// class CategoriaService
