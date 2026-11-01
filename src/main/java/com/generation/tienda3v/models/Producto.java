@@ -11,7 +11,7 @@ public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_producto")
-    private Integer idProducto;
+    private Long idProducto;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
@@ -34,34 +34,37 @@ public class Producto {
     @Column(name = "sku", nullable = false, length = 40, unique = true)
     private String sku;
 
-    @Column(name = "precio_unitario", nullable = false,
-            precision = 10, scale = 2)
-    private BigDecimal precioUnitario;
+    @Column(name = "precio", nullable = false, precision = 10, scale = 2)
+    private BigDecimal precio;
 
-    @Column(name = "imagen_url", length = 500)
-    private String imagenUrl;
+    @Column(name = "stock", nullable = false)
+    private Integer stock;
 
     @Column(name = "activo", nullable = false)
     private Boolean activo = true;
 
-    @Column(name = "fecha_creacion", nullable = false,
-            insertable = false, updatable = false)
+    @Column(name = "fecha_creacion", updatable = false)
     private LocalDateTime fechaCreacion;
 
+    @PrePersist
+    protected void onCreate() {
+        this.fechaCreacion = LocalDateTime.now();
+    }//onCreate
+
     public Producto() {
-    } //producto
+    }//Producto
 
-    public Integer getIdProducto() {
+    public Long getIdProducto() {
         return idProducto;
-    } //getIdProducto
+    }//getIdProducto
 
-    public void setIdProducto(Integer idProducto) {
+    public void setIdProducto(Long idProducto) {
         this.idProducto = idProducto;
-    } //setIdProducto
+    }//setIdProducto
 
     public Categoria getCategoria() {
         return categoria;
-    } //getCategoria
+    }//getCategoria
 
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
@@ -73,58 +76,62 @@ public class Producto {
 
     public void setNombreProducto(String nombreProducto) {
         this.nombreProducto = nombreProducto;
-    } //setNombreProducto
+    }//setNombreProducto
 
     public String getDescripcionProducto() {
         return descripcionProducto;
-    } //getDescripcionProducto
+    }//getDescripcionProducto
 
     public void setDescripcionProducto(String descripcionProducto) {
         this.descripcionProducto = descripcionProducto;
-    } //setDescripcionProducto
+    }//setDescripcionProducto
 
     public String getMarca() {
         return marca;
-    } //getMarca
+    }//getMarca
 
     public void setMarca(String marca) {
         this.marca = marca;
-    } //setMarca
+    }//setMarca
 
     public String getSku() {
         return sku;
-    } //setSku
+    }//getSku
 
     public void setSku(String sku) {
         this.sku = sku;
-    } //getSku
+    }//setSku
 
-    public BigDecimal getPrecioUnitario() {
-        return precioUnitario;
-    } //getPrecioUnitario
+    public BigDecimal getPrecio() {
+        return precio;
+    }//getPrecio
 
-    public void setPrecioUnitario(BigDecimal precioUnitario) {
-        this.precioUnitario = precioUnitario;
-    } //setPrecioUnitario
+    public void setPrecio(BigDecimal precio) {
+        this.precio = precio;
+    }//setPrecio
 
-    public String getImagenUrl() {
-        return imagenUrl;
-    } // setImagenUrl
+    public Integer getStock() {
+        return stock;
+    }//getStock
 
-    public void setImagenUrl(String imagenUrl) {
-        this.imagenUrl = imagenUrl;
-    } //setImagenUrl
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }//setStock
 
     public Boolean getActivo() {
         return activo;
-    } //getActivo
+    }//getActivo
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
-    } //setActivo
+    }//setActivo
 
     public LocalDateTime getFechaCreacion() {
         return fechaCreacion;
-    } //getFechaCreación
+    }//getFechaCreacion
 
-} //class producto
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }//setFechaCreacion
+
+}// class Producto
