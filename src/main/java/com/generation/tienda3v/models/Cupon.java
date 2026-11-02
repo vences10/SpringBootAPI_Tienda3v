@@ -1,7 +1,7 @@
 package com.generation.tienda3v.models;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,35 +11,45 @@ public class Cupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cupon")
-    private Integer idCupon;
+    private Long idCupon;
 
-    @Column(name = "codigo", nullable = false, length = 50, unique = true)
+    @Column(name = "codigo", nullable = false, unique = true, length = 30)
     private String codigo;
 
-    @Column(name = "porcentaje_descuento", nullable = false)
-    private Integer porcentajeDescuento;
+    @Column(name = "descuento_porcentaje", nullable = false, precision = 5, scale = 2)
+    private BigDecimal porcentajeDescuento;
 
-    @Column(name = "fecha_inicio", nullable = false)
-    private LocalDate fechaInicio;
+    @Column(name = "valido_desde")
+    private LocalDateTime fechaInicio;
 
-    @Column(name = "fecha_fin", nullable = false)
-    private LocalDate fechaFin;
+    @Column(name = "valido_hasta")
+    private LocalDateTime fechaFin;
+
+    @Column(name = "maximo_usos")
+    private Integer maximoUsos;
+
+    @Column(name = "usos", nullable = false)
+    private Integer usos = 0;
 
     @Column(name = "activo", nullable = false)
     private Boolean activo = true;
 
-    @Column(name = "fecha_creacion", nullable = false,
-            insertable = false, updatable = false)
+    @Column(name = "creado_en", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
     public Cupon() {
     }
 
-    public Integer getIdCupon() {
+    @PrePersist
+    protected void onCreate() {
+        this.fechaCreacion = LocalDateTime.now();
+    }
+
+    public Long getIdCupon() {
         return idCupon;
     }
 
-    public void setIdCupon(Integer idCupon) {
+    public void setIdCupon(Long idCupon) {
         this.idCupon = idCupon;
     }
 
@@ -51,28 +61,44 @@ public class Cupon {
         this.codigo = codigo;
     }
 
-    public Integer getPorcentajeDescuento() {
+    public BigDecimal getPorcentajeDescuento() {
         return porcentajeDescuento;
     }
 
-    public void setPorcentajeDescuento(Integer porcentajeDescuento) {
+    public void setPorcentajeDescuento(BigDecimal porcentajeDescuento) {
         this.porcentajeDescuento = porcentajeDescuento;
     }
 
-    public LocalDate getFechaInicio() {
+    public LocalDateTime getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(LocalDate fechaInicio) {
+    public void setFechaInicio(LocalDateTime fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public LocalDate getFechaFin() {
+    public LocalDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(LocalDate fechaFin) {
+    public void setFechaFin(LocalDateTime fechaFin) {
         this.fechaFin = fechaFin;
+    }
+
+    public Integer getMaximoUsos() {
+        return maximoUsos;
+    }
+
+    public void setMaximoUsos(Integer maximoUsos) {
+        this.maximoUsos = maximoUsos;
+    }
+
+    public Integer getUsos() {
+        return usos;
+    }
+
+    public void setUsos(Integer usos) {
+        this.usos = usos;
     }
 
     public Boolean getActivo() {
@@ -86,4 +112,5 @@ public class Cupon {
     public LocalDateTime getFechaCreacion() {
         return fechaCreacion;
     }
+
 }

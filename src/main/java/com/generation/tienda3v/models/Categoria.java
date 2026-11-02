@@ -1,11 +1,14 @@
 package com.generation.tienda3v.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "categorias")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Categoria {
 
     @Id
@@ -13,16 +16,17 @@ public class Categoria {
     @Column(name = "id_categoria")
     private Long idCategoria;
 
-    @Column(name = "nombre", nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, unique = true, length = 100)
     private String nombre;
 
-    @Column(name = "slug", nullable = false, length = 100)
+    @Column(name = "slug", nullable = false, unique = true, length = 100)
     private String slug;
 
     @Column(name = "activa", nullable = false)
     private Boolean activa = true;
 
-    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(mappedBy = "categoria")
     private List<Producto> productos = new ArrayList<>();
 
     public Categoria() {

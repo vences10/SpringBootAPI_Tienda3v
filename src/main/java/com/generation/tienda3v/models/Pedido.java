@@ -1,6 +1,7 @@
 package com.generation.tienda3v.models;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -9,49 +10,49 @@ public class Pedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
+    @Column(name = "id_pedido", nullable = false, unique = true)
     private Long id;
 
-    @Column(name = "usuario_id", nullable = false)
+    @Column(name = "id_usuario")
     private Long usuarioId;
 
-    @Column(name = "sucursal_id", nullable = false)
+    @Column(name = "id_sucursal", nullable = false)
     private Long sucursalId;
 
-    @Column(name = "metodo_pago_id", nullable = false)
+    @Column(name = "id_metodo_pago", nullable = false)
     private Long metodoPagoId;
 
-    @Column(name = "cupon_id")
+    @Column(name = "id_cupon")
     private Long cuponId;
 
     @Column(name = "estado", nullable = false, length = 30)
-    private String estado;
+    private String estado = "pendiente";
 
     @Column(name = "estado_pago", nullable = false, length = 30)
-    private String estadoPago;
+    private String estadoPago = "pendiente";
 
-    @Column(name = "nombre_cliente", nullable = false)
+    @Column(name = "nombre_cliente", nullable = false, length = 180)
     private String nombreCliente;
 
     @Column(name = "correo_cliente", nullable = false, length = 254)
     private String correoCliente;
 
-    @Column(name = "telefono_cliente", length = 20)
+    @Column(name = "telefono_cliente", nullable = false, length = 20)
     private String telefonoCliente;
 
     @Column(name = "codigo_cupon", length = 30)
     private String codigoCupon;
 
-    @Column(name = "subtotal", nullable = false)
-    private Double subtotal;
+    @Column(name = "subtotal", nullable = false, precision = 10, scale = 2)
+    private BigDecimal subtotal;
 
-    @Column(name = "descuento", nullable = false)
-    private Double descuento;
+    @Column(name = "descuento", nullable = false, precision = 10, scale = 2)
+    private BigDecimal descuento = BigDecimal.ZERO;
 
-    @Column(name = "total", nullable = false)
-    private Double total;
+    @Column(name = "total", nullable = false, precision = 10, scale = 2)
+    private BigDecimal total;
 
-    @Column(name = "creado_en", nullable = false)
+    @Column(name = "creado_en", nullable = false, updatable = false)
     private LocalDateTime creadoEn;
 
     @Column(name = "actualizado_en", nullable = false)
@@ -63,7 +64,7 @@ public class Pedido {
     // Constructor con parámetros principales
     public Pedido(Long usuarioId, Long sucursalId, Long metodoPagoId, Long cuponId, String estado,
                   String estadoPago, String nombreCliente, String correoCliente, String telefonoCliente,
-                  String codigoCupon, Double subtotal, Double descuento, Double total) {
+                  String codigoCupon, BigDecimal subtotal, BigDecimal descuento, BigDecimal total) {
         this.usuarioId = usuarioId;
         this.sucursalId = sucursalId;
         this.metodoPagoId = metodoPagoId;
@@ -74,10 +75,20 @@ public class Pedido {
         this.correoCliente = correoCliente;
         this.telefonoCliente = telefonoCliente;
         this.codigoCupon = codigoCupon;
-        this.subtotal = (subtotal != null && subtotal < 0) ? 0.0 : subtotal;
-        this.descuento = (descuento != null && descuento < 0) ? 0.0 : descuento;
-        this.total = (total != null && total < 0) ? 0.0 : total;
-        this.creadoEn = LocalDateTime.now();
+        this.subtotal = subtotal;
+        this.descuento = descuento;
+        this.total = total;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime ahora = LocalDateTime.now();
+        this.creadoEn = ahora;
+        this.actualizadoEn = ahora;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
         this.actualizadoEn = LocalDateTime.now();
     }
 
@@ -170,27 +181,27 @@ public class Pedido {
         this.codigoCupon = codigoCupon;
     }
 
-    public Double getSubtotal() {
+    public BigDecimal getSubtotal() {
         return subtotal;
     }
 
-    public void setSubtotal(Double subtotal) {
+    public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
     }
 
-    public Double getDescuento() {
+    public BigDecimal getDescuento() {
         return descuento;
     }
 
-    public void setDescuento(Double descuento) {
+    public void setDescuento(BigDecimal descuento) {
         this.descuento = descuento;
     }
 
-    public Double getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(Double total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 

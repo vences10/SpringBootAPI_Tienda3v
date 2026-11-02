@@ -4,9 +4,9 @@ import com.generation.tienda3v.models.Categoria;
 import com.generation.tienda3v.services.CategoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/categorias")
@@ -27,22 +27,23 @@ public class CategoriaController {
     }//listarCategoriasActivas
 
     @GetMapping("/{id}")
-    public Optional<Categoria> obtenerPorId(@PathVariable Long id) {
+    public Categoria obtenerPorId(@PathVariable Long id) {
         return categoriaService.obtenerPorId(id);
     }//obtenerPorId
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Categoria crearCategoria(@RequestBody Categoria categoria) {
         return categoriaService.guardar(categoria);
     }//crearCategoria
 
     @PutMapping("/{id}")
     public Categoria actualizarCategoria(@PathVariable Long id, @RequestBody Categoria categoria) {
-        categoria.setIdCategoria(id);
-        return categoriaService.guardar(categoria);
+        return categoriaService.actualizar(id, categoria);
     }//actualizarCategoria
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminarCategoria(@PathVariable Long id) {
         categoriaService.eliminar(id);
     }//eliminarCategoria

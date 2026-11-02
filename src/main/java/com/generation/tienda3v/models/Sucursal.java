@@ -1,5 +1,6 @@
 package com.generation.tienda3v.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -8,6 +9,7 @@ import jakarta.persistence.*;
                         columnNames = {"nombre", "direccion"})
                 })
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Sucursal {
 
     @Id // Identificador único, generado automáticamente por MySQL
@@ -15,7 +17,7 @@ public class Sucursal {
     @Column(name = "id_sucursal", nullable = false, unique = true)
     private Long id_sucursal;
     // Nombre de la sucursal
-    @Column(nullable = false, length = 120)
+    @Column(name = "nombre", nullable = false, length = 120)
     private String nombre_sucursal;
     // Dirección física
     @Column(nullable = false, length = 255)
@@ -47,7 +49,7 @@ public class Sucursal {
     }//getId
 
     public void setId(Long id) {
-        this.id_sucursal = id_sucursal;
+        this.id_sucursal = id;
     }//setId
 
     public String getNombre() {
@@ -55,7 +57,7 @@ public class Sucursal {
     }//getNombre
 
     public void setNombre(String nombre) {
-        this.nombre_sucursal = nombre_sucursal;
+        this.nombre_sucursal = nombre;
     }//setNombre
 
     public String getDireccion() {

@@ -1,6 +1,7 @@
 package com.generation.tienda3v.models;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "detalle_pedido")
@@ -8,38 +9,38 @@ public class DetallePedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
+    @Column(name = "id_detalle_pedido", nullable = false, unique = true)
     private Long id;
 
-    @Column(name = "pedido_id", nullable = false)
+    @Column(name = "id_pedido", nullable = false)
     private Long pedidoId;
 
-    @Column(name = "producto_id", nullable = false)
+    @Column(name = "id_producto")
     private Long productoId;
 
-    @Column(name = "nombre_producto", nullable = false)
+    @Column(name = "nombre_producto", nullable = false, length = 150)
     private String nombreProducto;
 
     @Column(name = "cantidad", nullable = false)
     private Integer cantidad;
 
-    @Column(name = "precio_unitario", nullable = false)
-    private Double precioUnitario;
+    @Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
+    private BigDecimal precioUnitario;
 
-    @Column(name = "subtotal", nullable = false)
-    private Double subtotal;
+    @Column(name = "subtotal", nullable = false, precision = 10, scale = 2)
+    private BigDecimal subtotal;
 
     // Constructor vacío
     public DetallePedido() {}
 
     // Constructor con parámetros
-    public DetallePedido(Long pedidoId, Long productoId, String nombreProducto, Integer cantidad, Double precioUnitario, Double subtotal) {
+    public DetallePedido(Long pedidoId, Long productoId, String nombreProducto, Integer cantidad, BigDecimal precioUnitario, BigDecimal subtotal) {
         this.pedidoId = pedidoId;
         this.productoId = productoId;
         this.nombreProducto = nombreProducto;
-        this.cantidad = (cantidad != null && cantidad < 0) ? 1 : cantidad;
-        this.precioUnitario = (precioUnitario != null && precioUnitario < 0) ? 0.0 : precioUnitario;
-        this.subtotal = (subtotal != null && subtotal < 0) ? 0.0 : subtotal;
+        this.cantidad = cantidad;
+        this.precioUnitario = precioUnitario;
+        this.subtotal = subtotal;
     }
 
     // Getters y Setters
@@ -80,23 +81,23 @@ public class DetallePedido {
     }
 
     public void setCantidad(Integer cantidad) {
-        this.cantidad = (cantidad != null && cantidad < 0) ? 1 : cantidad;
+        this.cantidad = cantidad;
     }
 
-    public Double getPrecioUnitario() {
+    public BigDecimal getPrecioUnitario() {
         return precioUnitario;
     }
 
-    public void setPrecioUnitario(Double precioUnitario) {
-        this.precioUnitario = (precioUnitario != null && precioUnitario < 0) ? 0.0 : precioUnitario;
+    public void setPrecioUnitario(BigDecimal precioUnitario) {
+        this.precioUnitario = precioUnitario;
     }
 
-    public Double getSubtotal() {
+    public BigDecimal getSubtotal() {
         return subtotal;
     }
 
-    public void setSubtotal(Double subtotal) {
-        this.subtotal = (subtotal != null && subtotal < 0) ? 0.0 : subtotal;
+    public void setSubtotal(BigDecimal subtotal) {
+        this.subtotal = subtotal;
     }
 
     @Override

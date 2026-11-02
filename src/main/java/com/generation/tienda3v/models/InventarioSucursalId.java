@@ -9,9 +9,9 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class InventarioSucursalId implements Serializable {
 
-    @Column(name = "sucursal_id")
+    @Column(name = "id_sucursal", nullable = false)
     private Long sucursalId; // ID de la sucursal
-    @Column(name = "producto_id")
+    @Column(name = "id_producto", nullable = false)
     private Long productoId; // ID del producto
 
     public InventarioSucursalId() {

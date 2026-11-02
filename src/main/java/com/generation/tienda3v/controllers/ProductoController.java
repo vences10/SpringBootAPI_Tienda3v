@@ -4,9 +4,9 @@ import com.generation.tienda3v.models.Producto;
 import com.generation.tienda3v.services.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/productos")
@@ -27,7 +27,7 @@ public class ProductoController {
     }//listarProductosActivos
 
     @GetMapping("/{id}")
-    public Optional<Producto> obtenerPorId(@PathVariable Long id) {
+    public Producto obtenerPorId(@PathVariable Long id) {
         return productoService.obtenerPorId(id);
     }//obtenerPorId
 
@@ -37,17 +37,18 @@ public class ProductoController {
     }//listarPorCategoria
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Producto crearProducto(@RequestBody Producto producto) {
         return productoService.guardar(producto);
     }//crearProducto
 
     @PutMapping("/{id}")
     public Producto actualizarProducto(@PathVariable Long id, @RequestBody Producto producto) {
-        producto.setIdProducto(id);
-        return productoService.guardar(producto);
+        return productoService.actualizar(id, producto);
     }//actualizarProducto
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminarProducto(@PathVariable Long id) {
         productoService.eliminar(id);
     }//eliminarProducto
