@@ -69,8 +69,7 @@ public class Usuario {
 
     // Constructor vacío requerido por JPA/Jackson
 
-    public Usuario() {
-    }
+    public Usuario() {}
 
     @PrePersist
     protected void onCreate() {
@@ -84,7 +83,6 @@ public class Usuario {
     }
 
     // Getters
-
     public Long getId() {
         return id;
     }
