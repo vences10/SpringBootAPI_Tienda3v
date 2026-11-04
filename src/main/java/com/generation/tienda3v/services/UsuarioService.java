@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -27,6 +29,40 @@ public class UsuarioService {
     public Usuario obtenerPorId(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+    }
+
+    public Usuario obtenerPorCorreo(String correo) {
+        if (correo == null || correo.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo es obligatorio");
+        }
+        return usuarioRepository.findByCorreo(correo.trim().toLowerCase())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+    }
+
+    public Usuario autenticar(String correo, String passwordInput) {
+        if (correo == null || correo.isBlank() || passwordInput == null || passwordInput.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Correo y contraseña obligatorios");
+        }
+        Usuario usuario = obtenerPorCorreo(correo);
+        if (Boolean.FALSE.equals(usuario.getActivo())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "La cuenta se encuentra inactiva");
+        }
+        String guardado = usuario.getPasswordHash();
+        String codificadoBase64 = Base64.getEncoder()
+                .encodeToString(passwordInput.getBytes(StandardCharsets.UTF_8));
+        if (!passwordInput.equals(guardado) && !codificadoBase64.equals(guardado)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Contraseña incorrecta");
+        }
+        return usuario;
+    }
+
+    public Usuario actualizarPasswordPorCorreo(String correo, String nuevoPasswordHash) {
+        if (nuevoPasswordHash == null || nuevoPasswordHash.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La nueva contraseña es obligatoria");
+        }
+        Usuario existente = obtenerPorCorreo(correo);
+        existente.setPasswordHash(nuevoPasswordHash);
+        return usuarioRepository.save(existente);
     }
 
     public Usuario crear(Usuario usuario) {

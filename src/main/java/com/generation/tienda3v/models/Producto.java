@@ -31,7 +31,7 @@ public class Producto {
     @Column(name = "precio_anterior", precision = 10, scale = 2)
     private BigDecimal precioAnterior;
 
-    @Column(name = "imagen_url", length = 500)
+    @Column(name = "imagen_url", columnDefinition = "LONGTEXT")
     private String imagenUrl;
 
     @Column(name = "activo", nullable = false)

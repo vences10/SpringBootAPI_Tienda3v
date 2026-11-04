@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -26,6 +27,25 @@ public class UsuarioController {
     @GetMapping("/{id}")
     public Usuario obtenerPorId(@PathVariable Long id) {
         return usuarioService.obtenerPorId(id);
+    }
+
+    @GetMapping("/correo/{correo}")
+    public Usuario obtenerPorCorreo(@PathVariable String correo) {
+        return usuarioService.obtenerPorCorreo(correo);
+    }
+
+    @PostMapping("/login")
+    public Usuario login(@RequestBody Map<String, String> credenciales) {
+        String correo = credenciales.get("correo");
+        String password = credenciales.getOrDefault("passwordHash", credenciales.get("password"));
+        return usuarioService.autenticar(correo, password);
+    }
+
+    @PutMapping("/password")
+    public Usuario actualizarPassword(@RequestBody Map<String, String> datos) {
+        String correo = datos.get("correo");
+        String passwordHash = datos.getOrDefault("passwordHash", datos.get("password"));
+        return usuarioService.actualizarPasswordPorCorreo(correo, passwordHash);
     }
 
     @PostMapping
