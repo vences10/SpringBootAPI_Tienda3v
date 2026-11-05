@@ -30,6 +30,10 @@ public class DetallePedidoService {
         return detallePedidoRepository.findAll();
     }
 
+    public List<DetallePedido> obtenerPorPedido(Long pedidoId) {
+        return detallePedidoRepository.findByPedidoId(pedidoId);
+    }
+
     public DetallePedido obtenerPorId(Long id) {
         return detallePedidoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Detalle de pedido no encontrado"));

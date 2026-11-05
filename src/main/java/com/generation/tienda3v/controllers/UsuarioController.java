@@ -34,6 +34,18 @@ public class UsuarioController {
         return usuarioService.obtenerPorCorreo(correo);
     }
 
+    @PostMapping("/solicitar-recuperacion")
+    public Map<String, String> solicitarRecuperacion(@RequestBody Map<String, String> body) {
+        String correo = body.get("correo");
+        Usuario usuario = usuarioService.obtenerPorCorreo(correo);
+        String token = usuarioService.generarTokenRecuperacion(correo);
+        return Map.of(
+                "correo", usuario.getCorreo(),
+                "nombre", (usuario.getNombre() + " " + usuario.getApellido()).trim(),
+                "token", token
+        );
+    }
+
     @PostMapping("/login")
     public Usuario login(@RequestBody Map<String, String> credenciales) {
         String correo = credenciales.get("correo");
@@ -45,7 +57,8 @@ public class UsuarioController {
     public Usuario actualizarPassword(@RequestBody Map<String, String> datos) {
         String correo = datos.get("correo");
         String passwordHash = datos.getOrDefault("passwordHash", datos.get("password"));
-        return usuarioService.actualizarPasswordPorCorreo(correo, passwordHash);
+        String token = datos.get("token");
+        return usuarioService.actualizarPasswordPorCorreo(correo, passwordHash, token);
     }
 
     @PostMapping

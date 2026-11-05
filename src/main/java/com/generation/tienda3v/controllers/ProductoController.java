@@ -1,7 +1,9 @@
 package com.generation.tienda3v.controllers;
 
 import com.generation.tienda3v.models.Producto;
+import com.generation.tienda3v.services.AdminAuthService;
 import com.generation.tienda3v.services.ProductoService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,9 @@ public class ProductoController {
 
     @Autowired
     private ProductoService productoService;
+
+    @Autowired
+    private AdminAuthService adminAuthService;
 
     @GetMapping
     public List<Producto> listarProductos() {
@@ -38,18 +43,21 @@ public class ProductoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Producto crearProducto(@RequestBody Producto producto) {
+    public Producto crearProducto(@RequestBody Producto producto, HttpServletRequest request) {
+        adminAuthService.verificarAdmin(request);
         return productoService.guardar(producto);
     }//crearProducto
 
     @PutMapping("/{id}")
-    public Producto actualizarProducto(@PathVariable Long id, @RequestBody Producto producto) {
+    public Producto actualizarProducto(@PathVariable Long id, @RequestBody Producto producto, HttpServletRequest request) {
+        adminAuthService.verificarAdmin(request);
         return productoService.actualizar(id, producto);
     }//actualizarProducto
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminarProducto(@PathVariable Long id) {
+    public void eliminarProducto(@PathVariable Long id, HttpServletRequest request) {
+        adminAuthService.verificarAdmin(request);
         productoService.eliminar(id);
     }//eliminarProducto
 

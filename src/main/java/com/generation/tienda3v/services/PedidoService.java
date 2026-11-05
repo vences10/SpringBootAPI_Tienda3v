@@ -1,5 +1,6 @@
 package com.generation.tienda3v.services;
 
+import com.generation.tienda3v.models.Cupon;
 import com.generation.tienda3v.models.Pedido;
 import com.generation.tienda3v.repositories.CuponRepository;
 import com.generation.tienda3v.repositories.MetodoPagoRepository;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,6 +40,10 @@ public class PedidoService {
         return pedidoRepository.findAll();
     }
 
+    public List<Pedido> obtenerPorUsuario(Long usuarioId) {
+        return pedidoRepository.findByUsuarioIdOrderByCreadoEnDesc(usuarioId);
+    }
+
     public Pedido obtenerPorId(Long id) {
         return pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
@@ -48,6 +54,22 @@ public class PedidoService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El id del pedido se genera automáticamente");
         }
         validarReferencias(pedido);
+        validarImportes(pedido);
+
+        if (pedido.getCuponId() != null) {
+            Cupon cupon = cuponRepository.findById(pedido.getCuponId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cupón no encontrado"));
+            if (Boolean.FALSE.equals(cupon.getActivo())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El cupón no se encuentra activo");
+            }
+            int usosActuales = cupon.getUsos() == null ? 0 : cupon.getUsos();
+            if (cupon.getMaximoUsos() != null && usosActuales >= cupon.getMaximoUsos()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El cupón ha alcanzado su límite de usos");
+            }
+            cupon.setUsos(usosActuales + 1);
+            cuponRepository.save(cupon);
+        }
+
         LocalDateTime ahora = LocalDateTime.now();
         pedido.setCreadoEn(ahora);
         pedido.setActualizadoEn(ahora);
@@ -57,6 +79,7 @@ public class PedidoService {
     public Pedido actualizar(Long id, Pedido pedido) {
         Pedido existente = obtenerPorId(id);
         validarReferencias(pedido);
+        validarImportes(pedido);
         existente.setUsuarioId(pedido.getUsuarioId());
         existente.setSucursalId(pedido.getSucursalId());
         existente.setMetodoPagoId(pedido.getMetodoPagoId());
@@ -74,8 +97,33 @@ public class PedidoService {
         return pedidoRepository.save(existente);
     }
 
+    public Pedido actualizarEstado(Long id, String estado, String estadoPago) {
+        Pedido existente = obtenerPorId(id);
+        if (estado != null && !estado.isBlank()) {
+            existente.setEstado(estado.trim());
+        }
+        if (estadoPago != null && !estadoPago.isBlank()) {
+            existente.setEstadoPago(estadoPago.trim());
+        }
+        existente.setActualizadoEn(LocalDateTime.now());
+        return pedidoRepository.save(existente);
+    }
+
     public void eliminar(Long id) {
         pedidoRepository.delete(obtenerPorId(id));
+    }
+
+    private void validarImportes(Pedido pedido) {
+        BigDecimal subtotal = pedido.getSubtotal() == null ? BigDecimal.ZERO : pedido.getSubtotal();
+        BigDecimal descuento = pedido.getDescuento() == null ? BigDecimal.ZERO : pedido.getDescuento();
+        BigDecimal total = pedido.getTotal() == null ? BigDecimal.ZERO : pedido.getTotal();
+
+        if (subtotal.compareTo(BigDecimal.ZERO) < 0 || descuento.compareTo(BigDecimal.ZERO) < 0 || total.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los importes del pedido no pueden ser negativos");
+        }
+        if (subtotal.subtract(descuento).compareTo(total) != 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El total debe ser igual a subtotal menos descuento");
+        }
     }
 
     private void validarReferencias(Pedido pedido) {

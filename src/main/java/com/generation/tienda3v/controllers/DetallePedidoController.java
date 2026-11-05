@@ -25,6 +25,11 @@ public class DetallePedidoController {
         return detallePedidoService.obtenerTodos();
     }
 
+    @GetMapping("/pedido/{pedidoId}")
+    public List<DetallePedido> listarPorPedido(@PathVariable Long pedidoId) {
+        return detallePedidoService.obtenerPorPedido(pedidoId);
+    }
+
     @GetMapping("/{id}")
     public DetallePedido obtenerPorId(@PathVariable Long id) {
         return detallePedidoService.obtenerPorId(id);
