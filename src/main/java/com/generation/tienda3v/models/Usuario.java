@@ -1,5 +1,6 @@
 package com.generation.tienda3v.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -9,11 +10,11 @@ public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
+    @Column(name = "id_usuario", nullable = false, unique = true)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "idRol", nullable = false)
+    @JoinColumn(name = "id_rol", nullable = false)
     private Rol rol;
 
     @Column(name = "nombre", nullable = false, length = 80)
@@ -28,14 +29,15 @@ public class Usuario {
     @Column(name = "telefono", nullable = false, length = 20)
     private String telefono;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
     @Column(name = "acepta_terminos", nullable = false)
-    private Boolean aceptaTerminos;
+    private Boolean aceptaTerminos = false;
 
     @Column(name = "activo", nullable = false)
-    private Boolean activo;
+    private Boolean activo = true;
 
     @Column(name = "creado_en", nullable = false)
     private LocalDateTime creadoEn;
@@ -67,8 +69,7 @@ public class Usuario {
 
     // Constructor vacío requerido por JPA/Jackson
 
-    public Usuario() {
-    }
+    public Usuario() {}
 
     @PrePersist
     protected void onCreate() {
@@ -82,9 +83,12 @@ public class Usuario {
     }
 
     // Getters
-
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Rol getRol() {
