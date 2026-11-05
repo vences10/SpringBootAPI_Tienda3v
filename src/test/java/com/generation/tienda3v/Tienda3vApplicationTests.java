@@ -1,8 +1,15 @@
 package com.generation.tienda3v;
 
+import com.generation.tienda3v.models.Rol;
+import com.generation.tienda3v.models.Usuario;
+import com.generation.tienda3v.repositories.RolRepository;
+import com.generation.tienda3v.repositories.UsuarioRepository;
+import com.generation.tienda3v.services.JwtService;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -28,6 +35,18 @@ class Tienda3vApplicationTests {
 
     @LocalServerPort
     private int puerto;
+
+    @Autowired
+    private RolRepository rolRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
 
     private final HttpClient cliente = HttpClient.newHttpClient();
     private final JsonMapper json = JsonMapper.builder().build();
@@ -155,6 +174,55 @@ class Tienda3vApplicationTests {
         assertEquals(404, enviar("GET", ruta, null).statusCode());
     }
 
+    @Test
+    void autenticacionJwtBCryptYControlDeRoles() throws Exception {
+        Rol rolCliente = rolRepository.findByNombre("cliente").orElseGet(() -> {
+            Rol r = new Rol();
+            r.setNombre("cliente");
+            return rolRepository.save(r);
+        });
+
+        String correoCliente = "cliente-" + unico() + "@tienda3v.com";
+        String registroJson = """
+                {"rol":{"id":%d},"nombre":"Carlos","apellido":"Lopez",
+                 "correo":"%s","telefono":"5587654321",
+                 "passwordHash":"Secreto123","aceptaTerminos":true,"activo":true}
+                """.formatted(rolCliente.getId(), correoCliente);
+
+        // 1. Registro público con encriptación BCrypt
+        HttpResponse<String> respRegistro = enviarConToken("POST", "/api/usuarios", registroJson, null);
+        assertEquals(201, respRegistro.statusCode(), respRegistro.body());
+
+        Usuario guardadoDb = usuarioRepository.findByCorreo(correoCliente).orElseThrow();
+        assertTrue(guardadoDb.getPasswordHash().startsWith("$2a$"));
+        assertTrue(passwordEncoder.matches("Secreto123", guardadoDb.getPasswordHash()));
+
+        // 2. Inicio de sesión y generación de token JWT
+        String loginJson = """
+                {"correo":"%s","password":"Secreto123"}
+                """.formatted(correoCliente);
+        HttpResponse<String> respLogin = enviarConToken("POST", "/api/auth/login", loginJson, null);
+        assertEquals(200, respLogin.statusCode(), respLogin.body());
+
+        JsonNode nodoToken = json.readTree(respLogin.body());
+        String tokenCliente = nodoToken.get("token").asString();
+        assertNotNull(tokenCliente);
+        assertFalse(tokenCliente.isBlank());
+        assertEquals("Bearer", nodoToken.get("tipo").asString());
+
+        // 3. Sin token -> 401 Unauthorized en ruta protegida
+        HttpResponse<String> sinToken = enviarConToken("GET", "/api/usuarios", null, null);
+        assertEquals(401, sinToken.statusCode());
+
+        // 4. Con token de cliente -> 403 Forbidden en ruta exclusiva de administrador
+        HttpResponse<String> comoCliente = enviarConToken("GET", "/api/usuarios", null, tokenCliente);
+        assertEquals(403, comoCliente.statusCode());
+
+        // 5. Con token de administrador -> 200 OK
+        HttpResponse<String> comoAdmin = enviar("GET", "/api/usuarios", null);
+        assertEquals(200, comoAdmin.statusCode());
+    }
+
     private void probarCrud(String recurso, String campoId, String datos, String cambios,
                             String campoActualizado) throws Exception {
         String base = "/api/" + recurso;
@@ -205,14 +273,42 @@ class Tienda3vApplicationTests {
         return json.readTree(respuesta.body());
     }
 
+    private String asegurarTokenAdmin() {
+        String correoAdmin = "admin-test@tienda3v.com";
+        usuarioRepository.findByCorreo(correoAdmin).orElseGet(() -> {
+            Rol rolAdmin = rolRepository.findByNombre("administrador").orElseGet(() -> {
+                Rol r = new Rol();
+                r.setNombre("administrador");
+                return rolRepository.save(r);
+            });
+            Usuario admin = new Usuario();
+            admin.setRol(rolAdmin);
+            admin.setNombre("Admin");
+            admin.setApellido("Test");
+            admin.setCorreo(correoAdmin);
+            admin.setTelefono("5500000000");
+            admin.setPasswordHash(passwordEncoder.encode("AdminTest123"));
+            admin.setAceptaTerminos(true);
+            admin.setActivo(true);
+            return usuarioRepository.save(admin);
+        });
+        return jwtService.generarToken(correoAdmin);
+    }
+
     private HttpResponse<String> enviar(String metodo, String ruta, String datos) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + puerto + ruta))
+        return enviarConToken(metodo, ruta, datos, asegurarTokenAdmin());
+    }
+
+    private HttpResponse<String> enviarConToken(String metodo, String ruta, String datos, String token) throws Exception {
+        HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create("http://localhost:" + puerto + ruta))
                 .timeout(Duration.ofSeconds(10))
                 .header("Content-Type", "application/json")
                 .method(metodo, datos == null ? HttpRequest.BodyPublishers.noBody()
-                        : HttpRequest.BodyPublishers.ofString(datos))
-                .build();
-        return cliente.send(request, HttpResponse.BodyHandlers.ofString());
+                        : HttpRequest.BodyPublishers.ofString(datos));
+        if (token != null && !token.isBlank()) {
+            builder.header("Authorization", "Bearer " + token);
+        }
+        return cliente.send(builder.build(), HttpResponse.BodyHandlers.ofString());
     }
 
     private long crearRol() throws Exception {

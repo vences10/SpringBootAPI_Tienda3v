@@ -37,13 +37,7 @@ public class UsuarioController {
     @PostMapping("/solicitar-recuperacion")
     public Map<String, String> solicitarRecuperacion(@RequestBody Map<String, String> body) {
         String correo = body.get("correo");
-        Usuario usuario = usuarioService.obtenerPorCorreo(correo);
-        String token = usuarioService.generarTokenRecuperacion(correo);
-        return Map.of(
-                "correo", usuario.getCorreo(),
-                "nombre", (usuario.getNombre() + " " + usuario.getApellido()).trim(),
-                "token", token
-        );
+        return usuarioService.generarTokenRecuperacion(correo);
     }
 
     @PostMapping("/login")
