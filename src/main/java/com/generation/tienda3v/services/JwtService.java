@@ -42,10 +42,17 @@ public class JwtService {
             return false;
         } // Verificamos que la cuenta esté activa
 
-        return encoder.matches( // Comparamos la contraseña con BCrypt
+
+
+        boolean coincide = encoder.matches(
                 request.getPassword(),
                 usr.getPasswordHash()
         );
+
+
+
+        return coincide;
+
     }//validarUsuario
 
     public String generarToken(String correo) { // Generamos el token JWT

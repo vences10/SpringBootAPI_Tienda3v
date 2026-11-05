@@ -99,12 +99,19 @@ public class UsuarioService {
         // Asignar cliente sin importar el rol enviado en Postman
         usuario.setRol(rolCliente);
 
-        // Codificar la contraseña con BCrypt
+// Valores por defecto
+        usuario.setActivo(true);
+
+        if (usuario.getAceptaTerminos() == null) {
+            usuario.setAceptaTerminos(false);
+        }
+
+// Codificar contraseña
         usuario.setPasswordHash(
                 passwordEncoder.encode(usuario.getPasswordHash())
         );
 
-        // Guardar usuario
+// Guardar usuario
         return usuarioRepository.save(usuario);
     }
 

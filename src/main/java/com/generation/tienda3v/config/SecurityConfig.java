@@ -12,6 +12,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+//para modificar los puertos de el VSC y del IntelliJ
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
+
 /*
  *Configurar qué rutas son públicas.
  * Exigir autenticación para las demás rutas.
@@ -21,6 +28,35 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(List.of(
+                "http://127.0.0.1:5501",
+                "http://localhost:5501"
+        ));
+
+        configuration.setAllowedMethods(List.of(
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE",
+                "OPTIONS"
+        ));
+
+        configuration.setAllowedHeaders(List.of("*"));
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+    }
 
     @Bean // Registramos nuestro filtro JWT
     public JwtFilter jwtFilter(UsuarioRepository usuarioRepository) {
@@ -43,6 +79,7 @@ public class SecurityConfig {
             JwtFilter jwtFilter
     ) throws Exception {
         http
+                .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())// Desactivamos CSRF porque utilizamos JWT
                 .sessionManagement(session -> // No utilizamos sesiones tradicionales
                         session.sessionCreationPolicy(

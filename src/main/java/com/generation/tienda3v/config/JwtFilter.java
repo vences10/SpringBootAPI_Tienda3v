@@ -7,6 +7,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,13 +34,15 @@ public class JwtFilter extends OncePerRequestFilter {
     }//jwtFilter
 
     // Clave secreta para firmar y validar los tokens
+    // String secret = System.getenv("JWT_SECRET");
+
     public static SecretKey getSignInKey() {
-        String secret = System.getenv("JWT_SECRET");
-        if (secret == null || secret.isBlank()) {
-            throw new IllegalStateException("Falta configurar JWT_SECRET");
-        }
+
+        String secret =
+                "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=";
 
         byte[] keyBytes = Base64.getDecoder().decode(secret);
+
         return io.jsonwebtoken.security.Keys.hmacShaKeyFor(keyBytes);
     }//getSignKey
 
@@ -72,7 +75,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
         try { // Validamos el token y recuperamos sus datos
             Claims claims = Jwts.parser()
-                    .verifyWith(getSignInKey())
+                    .verifyWith(JwtFilter.getSignInKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
