@@ -26,7 +26,7 @@ import java.util.Optional;
 public class JwtFilter extends OncePerRequestFilter {
 
     private static final String DEFAULT_JWT_SECRET_BASE64 =
-            "VGllbmRhM1ZfU2VjcmV0S2V5XzIwMjZfU3VwZXJTZWd1cmFfMjU2Qml0c19KV1Q=";
+            "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=";
 
     private final UsuarioRepository usuarioRepository;
 
@@ -35,6 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
     }//jwtFilter
 
     // Clave secreta para firmar y validar los tokens
+    // String secret = System.getenv("JWT_SECRET");
     public static SecretKey getSignInKey() {
         String secret = System.getenv("JWT_SECRET");
         if (secret == null || secret.isBlank()) {
@@ -114,3 +115,4 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }//doFilter
 }//classJwtFilter
+

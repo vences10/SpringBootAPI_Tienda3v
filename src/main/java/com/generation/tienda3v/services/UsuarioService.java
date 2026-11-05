@@ -198,6 +198,15 @@ public class UsuarioService {
             validarRol(usuario);
         }
 
+        // Valores por defecto
+        if (usuario.getActivo() == null) {
+            usuario.setActivo(true);
+        }
+
+        if (usuario.getAceptaTerminos() == null) {
+            usuario.setAceptaTerminos(false);
+        }
+
         // Codificar la contraseña con BCrypt
         usuario.setPasswordHash(
                 passwordEncoder.encode(usuario.getPasswordHash())

@@ -12,3 +12,4 @@ public class PasswordConfig {
         return new BCryptPasswordEncoder(); //genera hashes seguros de las contraseñas y permite verificarlos.
     }
 }
+

@@ -28,3 +28,4 @@ public class TokenJwt { //devuelve el token generado y el tipo de autenticación
         return usuario;
     }
 }//class TokenJwt
+

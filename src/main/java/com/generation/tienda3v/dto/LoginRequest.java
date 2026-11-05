@@ -31,3 +31,4 @@ public class LoginRequest { //recibe las credenciales del usuario.
         this.passwordHash = passwordHash;
     }
 }//class LoginRequets
+

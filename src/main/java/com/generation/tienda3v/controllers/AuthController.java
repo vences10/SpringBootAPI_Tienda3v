@@ -37,3 +37,4 @@ public class AuthController { //Este controlador recibirá el correo y la contra
         return ResponseEntity.ok(new TokenJwt(token, usuario)); // Devolvemos el token y datos del usuario
     }//login
 }//class AuthController
+
