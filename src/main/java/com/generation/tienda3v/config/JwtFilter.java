@@ -25,9 +25,6 @@ import java.util.Optional;
 
 public class JwtFilter extends OncePerRequestFilter {
 
-    private static final String DEFAULT_JWT_SECRET_BASE64 =
-            "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=";
-
     private final UsuarioRepository usuarioRepository;
 
     public JwtFilter(UsuarioRepository usuarioRepository) {
@@ -39,7 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
     public static SecretKey getSignInKey() {
         String secret = System.getenv("JWT_SECRET");
         if (secret == null || secret.isBlank()) {
-            secret = System.getProperty("JWT_SECRET", DEFAULT_JWT_SECRET_BASE64);
+            throw new IllegalStateException("Falta configurar JWT_SECRET");
         }
 
         byte[] keyBytes = Base64.getDecoder().decode(secret);
@@ -48,7 +45,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
     /*
     *1. Generar tu nueva clave secreta: Abre PowerShell y ejecuta:
-    * [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
+    * $bytes = New-Object byte[] 32
+    * $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+    * $rng.GetBytes($bytes)
+    * [Convert]::ToBase64String($bytes)
+    * $rng.Dispose()
+
     * Obtendrás una cadena larga. Cópiala y guárdala en un lugar privado.
     * 2. Configurarla en IntelliJ: Entra a Run → Edit Configurations.
     * 3. Selecciona la configuración de tu aplicación Spring Boot.
