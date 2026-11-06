@@ -117,12 +117,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/productos/**", "/api/cupones/**").hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.PUT, "/api/productos/**", "/api/cupones/**").hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/productos/**", "/api/cupones/**").hasRole("ADMINISTRADOR")
-                        // Clientes autenticados y administradores pueden consultar/actualizar su propio perfil y ver/modificar recolección de sus pedidos
+                        // Clientes autenticados y administradores pueden consultar/actualizar su propio perfil y ver sus pedidos
                         .requestMatchers(HttpMethod.GET, "/api/usuarios/*").hasAnyRole("ADMINISTRADOR", "CLIENTE")
                         .requestMatchers(HttpMethod.PUT, "/api/usuarios/*").hasAnyRole("ADMINISTRADOR", "CLIENTE")
                         .requestMatchers(HttpMethod.GET, "/api/pedidos/**", "/api/detalles-pedido/**").hasAnyRole("ADMINISTRADOR", "CLIENTE")
-                        .requestMatchers(HttpMethod.PATCH, "/api/pedidos/*/recoleccion").hasAnyRole("ADMINISTRADOR", "CLIENTE")
-                        // Solo administradores pueden listar todos los usuarios, eliminarlos o cambiar estado de pedidos
+                        // Solo administradores pueden listar todos los usuarios, eliminarlos o modificar estado/horario de pedidos
                         .requestMatchers(HttpMethod.PATCH, "/api/pedidos/**").hasRole("ADMINISTRADOR")
                         .requestMatchers("/api/usuarios/**") // Solo administradores pueden administrar usuarios
                         .hasRole("ADMINISTRADOR")

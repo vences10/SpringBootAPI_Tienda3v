@@ -59,7 +59,8 @@ public class PedidoController {
     }
 
     @PatchMapping("/{id}/recoleccion")
-    public Pedido actualizarRecoleccionPedido(@PathVariable Long id, @RequestBody Map<String, String> datos) {
+    public Pedido actualizarRecoleccionPedido(@PathVariable Long id, @RequestBody Map<String, String> datos, HttpServletRequest request) {
+        adminAuthService.verificarAdmin(request);
         return pedidoService.actualizarRecoleccion(id, datos.get("fechaRecoleccion"), datos.get("horarioRecoleccion"));
     }
 
