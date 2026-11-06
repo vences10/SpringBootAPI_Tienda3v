@@ -1,0 +1,180 @@
+{
+  "info": {
+    "name": "Tienda 3V - Spring Boot API",
+    "description": "Colección de pruebas básicas para el Backend de Tienda 3V (MySQL + Spring Boot)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Categorías - Listar todas",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/categorias",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "categorias"]
+        }
+      }
+    },
+    {
+      "name": "2. Productos - Listar todos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/productos",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "productos"]
+        }
+      }
+    },
+    {
+      "name": "3. Productos - Crear nuevo producto",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"categoria\": { \"idCategoria\": 1 },\n  \"nombreProducto\": \"Arroz super extra 1kg\",\n  \"descripcionProducto\": \"Arroz blanco grano largo bolsa de 1 kg\",\n  \"precio\": 32.50,\n  \"precioAnterior\": 39.00,\n  \"imagenUrl\": \"aceite.jpg\",\n  \"activo\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/productos",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "productos"]
+        }
+      }
+    },
+    {
+      "name": "4. Usuarios - Listar todos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/usuarios",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "usuarios"]
+        }
+      }
+    },
+    {
+      "name": "5. Usuarios - Crear nuevo usuario (Cliente)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"rol\": { \"id\": 1 },\n  \"nombre\": \"Carlos\",\n  \"apellido\": \"Ramirez\",\n  \"correo\": \"carlos.ramirez@tienda3v.com\",\n  \"telefono\": \"5512345678\",\n  \"passwordHash\": \"Password123\",\n  \"aceptaTerminos\": true,\n  \"activo\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/usuarios",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "usuarios"]
+        }
+      }
+    },
+    {
+      "name": "6. Usuarios - Login (Autenticación)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"contacto.tiendas3v@gmail.com\",\n  \"passwordHash\": \"Pollitosenfuga3\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/usuarios/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "usuarios", "login"]
+        }
+      }
+    },
+    {
+      "name": "7. Cupones - Listar todos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/cupones",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "cupones"]
+        }
+      }
+    },
+    {
+      "name": "8. Cupones - Crear cupón",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"PROMO20\",\n  \"porcentajeDescuento\": 20.00,\n  \"activo\": true,\n  \"usos\": 0\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/cupones",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "cupones"]
+        }
+      }
+    },
+    {
+      "name": "9. Sucursales - Listar todas",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/sucursales",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "sucursales"]
+        }
+      }
+    },
+    {
+      "name": "10. Pedidos - Crear pedido",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"usuarioId\": 1,\n  \"sucursalId\": 1,\n  \"metodoPagoId\": 2,\n  \"cuponId\": 1,\n  \"estado\": \"pendiente\",\n  \"estadoPago\": \"pendiente\",\n  \"nombreCliente\": \"Luis Fernando Martínez\",\n  \"correoCliente\": \"contacto.tiendas3v@gmail.com\",\n  \"telefonoCliente\": \"5500000000\",\n  \"codigoCupon\": \"BIENVENIDO10\",\n  \"subtotal\": 100.00,\n  \"descuento\": 10.00,\n  \"total\": 90.00\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/pedidos",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "pedidos"]
+        }
+      }
+    }
+  ]
+}
+

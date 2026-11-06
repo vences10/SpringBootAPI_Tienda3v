@@ -12,9 +12,13 @@ pom.xml.releaseBackup
 pom.xml.nextDevelopment
 release.properties
 
-### Gradle ###
+### Gradle & Eclipse/VS Code ###
 .gradle/
 build/
+bin/
+.settings/
+.classpath
+.project
 
 ### Log files & OS ###
 *.log
