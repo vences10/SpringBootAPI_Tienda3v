@@ -15,6 +15,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class PedidoService {
@@ -24,6 +27,10 @@ public class PedidoService {
     private final SucursalRepository sucursalRepository;
     private final MetodoPagoRepository metodoPagoRepository;
     private final CuponRepository cuponRepository;
+
+    private final Map<Long, DatosRecoleccion> recoleccionesPorPedido = new ConcurrentHashMap<>();
+
+    private record DatosRecoleccion(String fechaRecoleccion, String horarioRecoleccion) {}
 
     @Autowired
     public PedidoService(PedidoRepository pedidoRepository, UsuarioRepository usuarioRepository,
@@ -36,17 +43,41 @@ public class PedidoService {
         this.cuponRepository = cuponRepository;
     }
 
+    private Pedido enriquecerRecoleccion(Pedido pedido) {
+        if (pedido != null && pedido.getId() != null) {
+            DatosRecoleccion datos = recoleccionesPorPedido.get(pedido.getId());
+            if (datos != null) {
+                pedido.setFechaRecoleccion(datos.fechaRecoleccion());
+                pedido.setHorarioRecoleccion(datos.horarioRecoleccion());
+            }
+        }
+        return pedido;
+    }
+
+    private void guardarRecoleccionEnMemoria(Pedido pedido, String fecha, String horario) {
+        if (pedido != null && pedido.getId() != null && (fecha != null || horario != null)) {
+            recoleccionesPorPedido.put(pedido.getId(), new DatosRecoleccion(fecha, horario));
+            pedido.setFechaRecoleccion(fecha);
+            pedido.setHorarioRecoleccion(horario);
+        }
+    }
+
     public List<Pedido> obtenerTodos() {
-        return pedidoRepository.findAll();
+        List<Pedido> lista = pedidoRepository.findAll();
+        lista.forEach(this::enriquecerRecoleccion);
+        return lista;
     }
 
     public List<Pedido> obtenerPorUsuario(Long usuarioId) {
-        return pedidoRepository.findByUsuarioIdOrderByCreadoEnDesc(usuarioId);
+        List<Pedido> lista = pedidoRepository.findByUsuarioIdOrderByCreadoEnDesc(usuarioId);
+        lista.forEach(this::enriquecerRecoleccion);
+        return lista;
     }
 
     public Pedido obtenerPorId(Long id) {
-        return pedidoRepository.findById(id)
+        Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
+        return enriquecerRecoleccion(pedido);
     }
 
     public Pedido crear(Pedido pedido) {
@@ -55,6 +86,9 @@ public class PedidoService {
         }
         validarReferencias(pedido);
         validarImportes(pedido);
+
+        String fechaRecoleccion = pedido.getFechaRecoleccion();
+        String horarioRecoleccion = pedido.getHorarioRecoleccion();
 
         if (pedido.getCuponId() != null) {
             Cupon cupon = cuponRepository.findById(pedido.getCuponId())
@@ -73,7 +107,9 @@ public class PedidoService {
         LocalDateTime ahora = LocalDateTime.now();
         pedido.setCreadoEn(ahora);
         pedido.setActualizadoEn(ahora);
-        return pedidoRepository.save(pedido);
+        Pedido guardado = pedidoRepository.save(pedido);
+        guardarRecoleccionEnMemoria(guardado, fechaRecoleccion, horarioRecoleccion);
+        return guardado;
     }
 
     public Pedido actualizar(Long id, Pedido pedido) {
@@ -94,7 +130,13 @@ public class PedidoService {
         existente.setDescuento(pedido.getDescuento());
         existente.setTotal(pedido.getTotal());
         existente.setActualizadoEn(LocalDateTime.now());
-        return pedidoRepository.save(existente);
+        Pedido guardado = pedidoRepository.save(existente);
+        if (pedido.getFechaRecoleccion() != null || pedido.getHorarioRecoleccion() != null) {
+            guardarRecoleccionEnMemoria(guardado, pedido.getFechaRecoleccion(), pedido.getHorarioRecoleccion());
+        } else {
+            enriquecerRecoleccion(guardado);
+        }
+        return guardado;
     }
 
     public Pedido actualizarEstado(Long id, String estado, String estadoPago) {
@@ -106,7 +148,22 @@ public class PedidoService {
             existente.setEstadoPago(estadoPago.trim());
         }
         existente.setActualizadoEn(LocalDateTime.now());
-        return pedidoRepository.save(existente);
+        return enriquecerRecoleccion(pedidoRepository.save(existente));
+    }
+
+    public Pedido actualizarRecoleccion(Long id, String fechaRecoleccion, String horarioRecoleccion) {
+        if (fechaRecoleccion == null || fechaRecoleccion.isBlank() || horarioRecoleccion == null || horarioRecoleccion.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha y el horario de recolección son obligatorios");
+        }
+        Pedido existente = obtenerPorId(id);
+        String estadoActual = existente.getEstado() == null ? "pendiente" : existente.getEstado().trim().toLowerCase();
+        if (Set.of("entregado", "completado", "cancelado").contains(estadoActual)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede modificar un pedido entregado o cancelado");
+        }
+        existente.setActualizadoEn(LocalDateTime.now());
+        Pedido guardado = pedidoRepository.save(existente);
+        guardarRecoleccionEnMemoria(guardado, fechaRecoleccion.trim(), horarioRecoleccion.trim());
+        return guardado;
     }
 
     public void eliminar(Long id) {

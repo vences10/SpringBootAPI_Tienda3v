@@ -58,6 +58,11 @@ public class PedidoController {
         return pedidoService.actualizarEstado(id, datos.get("estado"), datos.get("estadoPago"));
     }
 
+    @PatchMapping("/{id}/recoleccion")
+    public Pedido actualizarRecoleccionPedido(@PathVariable Long id, @RequestBody Map<String, String> datos) {
+        return pedidoService.actualizarRecoleccion(id, datos.get("fechaRecoleccion"), datos.get("horarioRecoleccion"));
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminarPedido(@PathVariable Long id, HttpServletRequest request) {

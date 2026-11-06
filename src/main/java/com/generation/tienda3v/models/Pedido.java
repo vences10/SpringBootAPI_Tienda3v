@@ -58,6 +58,12 @@ public class Pedido {
     @Column(name = "actualizado_en", nullable = false)
     private LocalDateTime actualizadoEn;
 
+    @Transient
+    private String fechaRecoleccion;
+
+    @Transient
+    private String horarioRecoleccion;
+
     // Constructor vacío
     public Pedido() {}
 
@@ -219,6 +225,22 @@ public class Pedido {
 
     public void setActualizadoEn(LocalDateTime actualizadoEn) {
         this.actualizadoEn = actualizadoEn;
+    }
+
+    public String getFechaRecoleccion() {
+        return fechaRecoleccion;
+    }
+
+    public void setFechaRecoleccion(String fechaRecoleccion) {
+        this.fechaRecoleccion = fechaRecoleccion;
+    }
+
+    public String getHorarioRecoleccion() {
+        return horarioRecoleccion;
+    }
+
+    public void setHorarioRecoleccion(String horarioRecoleccion) {
+        this.horarioRecoleccion = horarioRecoleccion;
     }
 
     @Override
